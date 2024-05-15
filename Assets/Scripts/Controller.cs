@@ -48,16 +48,56 @@ public class Controller : MonoBehaviour
 
     public void InitAdjacencyLists()
     {
-        //Matriz de adyacencia
-        int[,] matriu = new int[Constants.NumTiles, Constants.NumTiles];
+        // Matriz de adyacencia
+        int[,] adjacencyMatrix = new int[Constants.NumTiles, Constants.NumTiles];
 
-        //TODO: Inicializar matriz a 0's
+        // Paso 1: Inicializar matriz a 0's
+        for (int i = 0; i < Constants.NumTiles; i++)
+        {
+            for (int j = 0; j < Constants.NumTiles; j++)
+            {
+                adjacencyMatrix[i, j] = 0;
+            }
+        }
 
-        //TODO: Para cada posición, rellenar con 1's las casillas adyacentes (arriba, abajo, izquierda y derecha)
+        // Paso 2: Rellenar la matriz con 1's para las casillas adyacentes
+        for (int i = 0; i < Constants.NumTiles; i++)
+        {
+            // Calcular fila y columna de la casilla actual
+            int row = i / Constants.TilesPerRow;
+            int col = i % Constants.TilesPerRow;
 
-        //TODO: Rellenar la lista "adjacency" de cada casilla con los índices de sus casillas adyacentes
-
+            // Casilla de arriba
+            if (row > 0)
+            {
+                int adjacentIndex = i - Constants.TilesPerRow;
+                adjacencyMatrix[i, adjacentIndex] = 1;
+                tiles[i].adjacency.Add(adjacentIndex);
+            }
+            // Casilla de abajo
+            if (row < Constants.TilesPerRow - 1)
+            {
+                int adjacentIndex = i + Constants.TilesPerRow;
+                adjacencyMatrix[i, adjacentIndex] = 1;
+                tiles[i].adjacency.Add(adjacentIndex);
+            }
+            // Casilla de la izquierda
+            if (col > 0)
+            {
+                int adjacentIndex = i - 1;
+                adjacencyMatrix[i, adjacentIndex] = 1;
+                tiles[i].adjacency.Add(adjacentIndex);
+            }
+            // Casilla de la derecha
+            if (col < Constants.TilesPerRow - 1)
+            {
+                int adjacentIndex = i + 1;
+                adjacencyMatrix[i, adjacentIndex] = 1;
+                tiles[i].adjacency.Add(adjacentIndex);
+            }
+        }
     }
+
 
     //Reseteamos cada casilla: color, padre, distancia y visitada
     public void ResetTiles()
@@ -211,13 +251,4 @@ public class Controller : MonoBehaviour
 
 
     }
-    
-   
-    
-
-    
-
-   
-
-       
 }
