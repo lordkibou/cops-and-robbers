@@ -176,17 +176,36 @@ public class Controller : MonoBehaviour
 
     public void RobberTurn()
     {
-        clickedTile = robber.GetComponent<RobberMove>().currentTile;
-        tiles[clickedTile].current = true;
+        // Obtener la casilla actual del ladrón
+        int currentTileIndex = robber.GetComponent<RobberMove>().currentTile;
+        
+        // Marcar la casilla actual como visitada
+        tiles[currentTileIndex].current = true;
+        
+        // Calcular las casillas alcanzables desde la casilla actual del ladrón
         FindSelectableTiles(false);
-
-        /*TODO: Cambia el código de abajo para hacer lo siguiente
-        - Elegimos una casilla aleatoria entre las seleccionables que puede ir el caco
-        - Movemos al caco a esa casilla
-        - Actualizamos la variable currentTile del caco a la nueva casilla
-        */
-        robber.GetComponent<RobberMove>().MoveToTile(tiles[robber.GetComponent<RobberMove>().currentTile]);
+        
+        // Obtener las casillas alcanzables
+        List<int> selectableTiles = new List<int>();
+        foreach (Tile tile in tiles)
+        {
+            if (tile.selectable)
+            {
+                selectableTiles.Add(tile.numTile);
+            }
+        }
+        
+        // Elegir aleatoriamente una casilla alcanzable como destino del movimiento del ladrón
+        int randomIndex = Random.Range(0, selectableTiles.Count);
+        int destinationTileIndex = selectableTiles[randomIndex];
+        
+        // Mover al ladrón a la casilla elegida
+        robber.GetComponent<RobberMove>().MoveToTile(tiles[destinationTileIndex]);
+        
+        // Actualizar la variable currentTile del ladrón a la nueva casilla
+        robber.GetComponent<RobberMove>().currentTile = destinationTileIndex;
     }
+
 
     public void EndGame(bool end)
     {
