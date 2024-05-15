@@ -245,29 +245,56 @@ public class Controller : MonoBehaviour
         rounds.text = "Rounds: " + roundCount;
     }
 
-    public void FindSelectableTiles(bool cop)
+    public void FindSelectableTiles(bool isCop)
     {
-                 
-        int indexcurrentTile;        
-
-        if (cop==true)
-            indexcurrentTile = cops[clickedCop].GetComponent<CopMove>().currentTile;
-        else
-            indexcurrentTile = robber.GetComponent<RobberMove>().currentTile;
-
-        //La ponemos rosa porque acabamos de hacer un reset
-        tiles[indexcurrentTile].current = true;
-
-        //Cola para el BFS
-        Queue<Tile> nodes = new Queue<Tile>();
-
-        //TODO: Implementar BFS. Los nodos seleccionables los ponemos como selectable=true
-        //Tendrás que cambiar este código por el BFS
-        for(int i = 0; i < Constants.NumTiles; i++)
+        // Obtener el índice de la casilla actual del ladrón o del policía según corresponda
+        int currentIndex;
+        if (isCop)
         {
-            tiles[i].selectable = true;
+            currentIndex = cops[clickedCop].GetComponent<CopMove>().currentTile;
         }
-
-
+        else
+        {
+            currentIndex = robber.GetComponent<RobberMove>().currentTile;
+        }
+        
+        // Marcar la casilla actual como visitada
+        tiles[currentIndex].current = true;
+        
+        // Cola para el BFS
+        Queue<int> queue = new Queue<int>();
+        queue.Enqueue(currentIndex);
+        
+        // BFS para encontrar las casillas alcanzables
+        while (queue.Count > 0)
+        {
+            int currentTileIndex = queue.Dequeue();
+            
+            // Obtener las casillas adyacentes de la casilla actual
+            List<int> adjacentTiles = tiles[currentTileIndex].adjacency;
+            
+            // Recorrer las casillas adyacentes
+            foreach (int adjacentIndex in adjacentTiles)
+            {
+                if (!tiles[adjacentIndex].visited)
+                {
+                    // Marcar la casilla adyacente como visitada
+                    tiles[adjacentIndex].visited = true;
+                    
+                    // Marcar la casilla adyacente como seleccionable
+                    tiles[adjacentIndex].selectable = true;
+                    
+                    // Encolar la casilla adyacente para explorar sus vecinos
+                    queue.Enqueue(adjacentIndex);
+                }
+            }
+        }
+        
+        // Reiniciar el estado de visitado de todas las casillas para el próximo cálculo
+        foreach (Tile tile in tiles)
+        {
+            tile.visited = false;
+        }
     }
+
 }
