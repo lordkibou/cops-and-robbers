@@ -257,44 +257,68 @@ public class Controller : MonoBehaviour
         {
             currentIndex = robber.GetComponent<RobberMove>().currentTile;
         }
-        
+
         // Marcar la casilla actual como visitada
         tiles[currentIndex].current = true;
-        
+
         // Cola para el BFS
-        Queue<int> queue = new Queue<int>();
-        queue.Enqueue(currentIndex);
-        
-        // BFS para encontrar las casillas alcanzables
+        Queue<Tile> queue = new Queue<Tile>();
+        queue.Enqueue(tiles[currentIndex]);
+        tiles[currentIndex].visited = true;
+
+        // BFS para encontrar las casillas alcanzables hasta una distancia de 2 movimientos
         while (queue.Count > 0)
         {
-            int currentTileIndex = queue.Dequeue();
-            
-            // Obtener las casillas adyacentes de la casilla actual
-            List<int> adjacentTiles = tiles[currentTileIndex].adjacency;
-            
-            // Recorrer las casillas adyacentes
-            foreach (int adjacentIndex in adjacentTiles)
+            Tile currentTile = queue.Dequeue();
+            int currentDistance = currentTile.distance;
+
+            // Si la distancia actual es mayor o igual a 2, no necesitamos explorar más
+            if (currentDistance < 2)
             {
-                if (!tiles[adjacentIndex].visited)
+                // Obtener las casillas adyacentes de la casilla actual
+                foreach (int adjacentIndex in currentTile.adjacency)
                 {
-                    // Marcar la casilla adyacente como visitada
-                    tiles[adjacentIndex].visited = true;
-                    
-                    // Marcar la casilla adyacente como seleccionable
-                    tiles[adjacentIndex].selectable = true;
-                    
-                    // Encolar la casilla adyacente para explorar sus vecinos
-                    queue.Enqueue(adjacentIndex);
+                    Tile adjacentTile = tiles[adjacentIndex];
+
+                    if (!isAdjacentTileVisitable(adjacentTile, currentIndex, isCop)) continue;
+
+                    if (!adjacentTile.visited)
+                    {
+                        markUnvisitedAdjacentTile(adjacentTile, currentTile, currentDistance);
+                        queue.Enqueue(adjacentTile);
+                    }
                 }
             }
         }
-        
-        // Reiniciar el estado de visitado de todas las casillas para el próximo cálculo
+        resetTilesBFS();
+    }
+
+    public void resetTilesBFS(){
         foreach (Tile tile in tiles)
         {
             tile.visited = false;
+            tile.distance = 0;
         }
     }
 
+    public bool isAdjacentTileVisitable(Tile adjacentTile, int currentIndex, bool isCop){
+        // Regla 1: Las fichas no pueden moverse a su propia casilla
+        if (adjacentTile.numTile == currentIndex)
+            return false;
+        // Regla 2: Un policía no puede moverse a la casilla ocupada por el ladrón
+        if (isCop && (adjacentTile.numTile == robber.GetComponent<RobberMove>().currentTile))
+            return false;
+        // Regla 3: Un policía no puede moverse a una casilla que requiera pasar por la casilla ocupada por el otro policía
+        if (isCop && (adjacentTile.numTile == cops[1 - clickedCop].GetComponent<CopMove>().currentTile))
+            return false;
+        return true;
+    }
+
+    public void markUnvisitedAdjacentTile(Tile adjacentTile, Tile currentTile, int currentDistance){
+        adjacentTile.visited = true;
+        adjacentTile.parent = currentTile;
+        adjacentTile.distance = currentDistance + 1;
+        adjacentTile.selectable = true;
+    }
 }
+
