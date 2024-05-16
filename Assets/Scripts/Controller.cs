@@ -221,7 +221,6 @@ public class Controller : MonoBehaviour
                 farthestTileIndex = tileIndex;
             }
         }
-
         robber.GetComponent<RobberMove>().MoveToTile(tiles[farthestTileIndex]);
         robber.GetComponent<RobberMove>().currentTile = farthestTileIndex;
     }
@@ -263,7 +262,6 @@ public class Controller : MonoBehaviour
                 }
             }
         }
-
         // Si no se encuentra un camino, retorna una distancia infinita
         return float.MaxValue;
     }
