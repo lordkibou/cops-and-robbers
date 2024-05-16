@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -280,20 +280,20 @@ public class Controller : MonoBehaviour
                 {
                     Tile adjacentTile = tiles[adjacentIndex];
 
-                    if (!isAdjacentTileVisitable(adjacentTile, currentIndex, isCop)) continue;
+                    if (!IsAdjacentTileVisitable(adjacentTile, currentIndex, isCop)) continue;
 
                     if (!adjacentTile.visited)
                     {
-                        markUnvisitedAdjacentTile(adjacentTile, currentTile, currentDistance);
+                        MarkUnvisitedAdjacentTile(adjacentTile, currentTile, currentDistance);
                         queue.Enqueue(adjacentTile);
                     }
                 }
             }
         }
-        resetTilesBFS();
+        ResetTilesBFS();
     }
 
-    public void resetTilesBFS(){
+    private void ResetTilesBFS(){
         foreach (Tile tile in tiles)
         {
             tile.visited = false;
@@ -301,7 +301,7 @@ public class Controller : MonoBehaviour
         }
     }
 
-    public bool isAdjacentTileVisitable(Tile adjacentTile, int currentIndex, bool isCop){
+    private bool IsAdjacentTileVisitable(Tile adjacentTile, int currentIndex, bool isCop){
         // Regla 1: Las fichas no pueden moverse a su propia casilla
         if (adjacentTile.numTile == currentIndex)
             return false;
@@ -314,7 +314,7 @@ public class Controller : MonoBehaviour
         return true;
     }
 
-    public void markUnvisitedAdjacentTile(Tile adjacentTile, Tile currentTile, int currentDistance){
+    private void MarkUnvisitedAdjacentTile(Tile adjacentTile, Tile currentTile, int currentDistance){
         adjacentTile.visited = true;
         adjacentTile.parent = currentTile;
         adjacentTile.distance = currentDistance + 1;
